@@ -1,0 +1,81 @@
+#importando bibliotecas
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+plt.style.use('ggplot')  #estilo de visualização de dados
+
+df = pd.read_csv('heart_failure_clinical_records_dataset.csv')
+df #mostrando o dataframe
+
+df.head() #topo do dataframe
+
+df.info()
+
+df.describe()
+
+plt.figure(figsize=(20,10)) #colocando a figura
+sns.countplot(data=df, x='DEATH_EVENT') #escolhendo a estatística
+plt.title('Casos de morte')
+plt.show()
+
+plt.figure(figsize=(20,10))
+sns.histplot(data=df, x='time', hue='DEATH_EVENT', bins=30, multiple='dodge')
+plt.title('Relação entre tempo e casos de mortes.')
+plt.show()
+
+#em vermelho, sobreviventes, em azul, óbitos.
+
+plt.figure(figsize=(20,10))
+sns.histplot(data=df, x='age', hue='DEATH_EVENT', multiple='dodge', bins=30)
+plt.title('Mortes por idade')
+plt.show()
+
+#da figura acima, pode-se perceber que o índice relativo ao total de óbitos aumenta conforme a idade, ou seja, o índice de sobrevivência diminui conforme a idade.
+
+plt.figure(figsize=(20,10))
+sns.countplot(data=df, x='anaemia', hue='DEATH_EVENT')
+plt.title('Relação entre índices de anemia e mortes')
+plt.show()
+
+#da imagem, percebe-se que o índice de mortes cresce com o aumento dos índices de anemia.
+
+plt.figure(figsize=(12,4))
+sns.countplot(data=df, x='diabetes', hue='DEATH_EVENT')
+plt.title('Relação entre diabetes e óbitos')
+plt.show()
+
+#dos gráficos, percebe-se que também há uma relação entre o índice de diabetes e o aumento do índice de óbitos.
+
+plt.figure(figsize=(20,10))
+sns.countplot(data=df, x='high_blood_pressure', hue='DEATH_EVENT')
+plt.title('Relação entre alta pressão sanguínea e mortes.')
+plt.show()
+
+#do gráfico, percebe-se que um aumento da pressão sanguínea leva a um aumento no número de óbitos.
+
+#agora, vamos fazer um modelo preditivo.
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
+
+x = df.drop('DEATH_EVENT', axis=1)
+y = df['DEATH_EVENT'].copy()
+x_treino, x_teste, y_treino, y_teste = train_test_split(x, y, test_size=0.1, random_state=35)
+
+print(x_treino.shape, y_treino.shape)
+print(x_teste.shape, y_teste.shape)
+
+model = LogisticRegression()
+
+model.fit(x_treino, y_treino)
+
+y_pred = model.predict(x_teste)
+acuracia = accuracy_score(y_teste, y_pred)
+
+print(acuracia)
+
+#o modelo preditivo construído tem acurácia de cerca de 87%.
